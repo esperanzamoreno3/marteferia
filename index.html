@@ -34,11 +34,10 @@
 
     .result-box { margin-top: 20px; animation: fadeIn 0.4s ease forwards; }
     .badge { display: inline-block; font-weight: 800; padding: 10px 24px; border-radius: 50px; font-size: 1.25rem; margin: 12px 0 8px; }
-    .badge-win { background: #ffd700; color: #111; border: 2px solid #fff; }
     .badge-lose { background: #333; color: #eee; }
     .badge-horario { background: #d32f2f; color: #fff; font-size: 1rem; padding: 10px 16px; }
 
-    .time-box { font-size: 1rem; font-weight: bold; color: #ffeb3b; margin-bottom: 12px; background: rgba(255, 235, 59, 0.15); padding: 6px 12px; border-radius: 8px; display: inline-block; }
+    .time-box { font-size: 0.95rem; font-weight: bold; color: #ffeb3b; margin: 10px 0 14px; background: rgba(255, 235, 59, 0.15); padding: 6px 12px; border-radius: 8px; display: inline-block; }
     .rules { text-align: left; font-size: 0.85rem; background: rgba(255,255,255,0.08); padding: 14px; border-radius: 12px; margin-top: 14px; line-height: 1.45; }
     .rules li { margin-left: 18px; margin-bottom: 5px; }
 
@@ -59,7 +58,7 @@
     }
     .slider-text {
       color: #ffd700;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: bold;
       pointer-events: none;
       letter-spacing: 0.5px;
@@ -89,6 +88,7 @@
       font-weight: bold;
       margin: 16px 0;
       border: 2px solid #a5d6a7;
+      animation: fadeIn 0.3s ease;
     }
 
     /* Modal Secreto */
@@ -124,7 +124,6 @@
   <div class="admin-content">
     <h3>🔒 PANEL DE CONTROL</h3>
     <div class="stat-item">Tiradas locales: <strong id="statTiradas">0</strong></div>
-    <div class="stat-item">Premios locales: <strong id="statPremios">0</strong></div>
     <p style="font-size:0.8rem; color:#bbb; margin-top:8px;">Control general de la caseta:</p>
     <a href="https://docs.google.com/spreadsheets" target="_blank" class="btn-sheet">📊 Abrir Google Sheets</a>
     <button class="btn-admin" onclick="cerrarAdmin()">Cerrar Panel</button>
@@ -135,9 +134,9 @@
   const PIN_ADMIN = "2024";
   
   // PEGA AQUÍ LA URL COMPLETA DE TU APPS SCRIPT ENTRE LAS COMILLAS
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQzXLuXp1g3gNi4-Ryb6-_mObobfYUVPLh7Shd7I23ea5QiZwXHkM-Bh1DBg1r1IWq/exec";
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybV1k1ZkXp-oZ1mC9Xz9-YOUR-ID/exec";
 
-  // Detección de día y configuración de color
+  // Detección de día y estilo visual
   const fecha = new Date();
   const diaSemana = fecha.getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb
   const hora = fecha.getHours();
@@ -155,7 +154,7 @@
   document.body.classList.add(diasConfig[diaSemana].clase);
   document.getElementById("diaTag").textContent = diasConfig[diaSemana].tag;
 
-  // Horario: Desde las 14:00 h hasta las 04:00 h de la madrugada
+  // Horario: Desde las 14:00 h hasta las 04:00 h
   const esValido = (hora >= 14 || hora < 4);
 
   const sectores = [
@@ -223,7 +222,7 @@
     let totalT = parseInt(localStorage.getItem("admin_tiradas") || "0") + 1;
     localStorage.setItem("admin_tiradas", totalT);
 
-    // MODO PRUEBA ACTIVO: Fuerza que siempre toque premio (1.50€ cubata, 1€ rebujito o chupito)
+    // MODO PRUEBA ACTIVO (Fuerza siempre premio para probar)
     const premiosPrueba = [
       { type: "dto_cubata", dto: 1.50 },
       { type: "dto_rebujito", dto: 1.00 },
@@ -233,12 +232,11 @@
     const targetType = premioElegido.type;
     const dtoVal = premioElegido.dto;
 
-   // Enviar a Google Sheets y obtener número global
-    let peticionSheet = Promise.resolve(null);
+    // Enviar a Google Sheets en segundo plano sin esperar respuesta
     if (GOOGLE_SCRIPT_URL && !GOOGLE_SCRIPT_URL.includes("YOUR-ID")) {
-      peticionSheet = fetch(GOOGLE_SCRIPT_URL, {
+      fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors", // Envía el dato garantizado sin bloqueo
+        mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           fecha: new Date().toLocaleString("es-ES"),
@@ -247,8 +245,8 @@
           tipo: targetType,
           descuento: dtoVal
         })
-      }).then(() => null).catch(() => null);
-    } 
+      }).catch(() => null);
+    }
 
     const indices = [];
     sectores.forEach((sec, idx) => { if (sec.type === targetType) indices.push(idx); });
@@ -267,40 +265,35 @@
         requestAnimationFrame(animate);
       } else {
         isSpinning = false;
-        peticionSheet.then(data => {
-          let numFinal = (data && data.numeroPremio) ? data.numeroPremio : (parseInt(localStorage.getItem("contador_premios") || "0") + 1);
-          localStorage.setItem("contador_premios", numFinal);
-          mostrarPremio(targetType, numFinal);
-        });
+        mostrarPremio(targetType);
       }
     }
     requestAnimationFrame(animate);
   }
 
-  function mostrarPremio(tipo, numPremio) {
+  function mostrarPremio(tipo) {
     let tit = "", det = "";
-    if (tipo === "dto_cubata") { tit = "🍹 ¡1,50€ DE DESCUENTO EN CUBATA!"; det = "Descuento de 1,50 € en tu cubata al pedir en caja."; }
-    else if (tipo === "dto_rebujito") { tit = "🌿 ¡1,00€ DE DESCUENTO EN REBUJITO!"; det = "Descuento de 1,00 € en tu rebujito al pedir en caja."; }
-    else { tit = "🥃 ¡CHUPITO DE REGALO!"; det = "Un chupito gratis al pedir tu consumición."; }
+    if (tipo === "dto_cubata") { tit = "🍹 ¡1,50€ DE DESCUENTO EN CUBATA!"; det = "Descuento de 1,50 € en tu cubata al pedir en barra."; }
+    else if (tipo === "dto_rebujito") { tit = "🌿 ¡1,00€ DE DESCUENTO EN REBUJITO!"; det = "Descuento de 1,00 € en tu rebujito al pedir en barra."; }
+    else { tit = "🥃 ¡CHUPITO DE REGALO!"; det = "Un chupito de regalo al pedir tu consumición."; }
 
     resultadoDiv.innerHTML = `
       <div class="result-box">
-        <h2 style="font-size:1.3rem; color:#ffd700;">${tit}</h2>
-        <div class="badge badge-win">PREMIO ${numPremio}</div><br>
-        <div class="time-box">📅 Válido durante todo el día de hoy</div>
+        <h2 style="font-size:1.35rem; color:#ffd700; margin-bottom: 6px;">${tit}</h2>
+        <div class="time-box">📅 Válido únicamente hoy en Caseta El Resucitado</div>
         
-        <!-- Botón deslizante interactivo -->
+        <!-- Botón deslizante interactivo de barra -->
         <div class="slider-wrapper" id="sliderWrapper">
           <span class="slider-text">DESLIZAR PARA CANJEAR ➔</span>
           <div class="slider-handle" id="sliderHandle">➔</div>
         </div>
 
         <div class="rules">
-          <strong>Cómo canjear en El Resucitado:</strong>
+          <strong>Cómo canjear tu consumición:</strong>
           <ul>
             <li>${det}</li>
-            <li>Enseña esta pantalla en <strong>CAJA</strong> para aplicar la promoción.</li>
-            <li>El camarero deslizará la barra para validar el premio.</li>
+            <li>Muestra esta pantalla al camarero al pedir.</li>
+            <li>El personal deslizará la barra para validar y entregar el premio.</li>
           </ul>
         </div>
       </div>
@@ -309,7 +302,6 @@
     activarBotonDeslizante();
   }
 
-  // Lógica del botón táctil deslizante
   function activarBotonDeslizante() {
     const handle = document.getElementById("sliderHandle");
     const wrapper = document.getElementById("sliderWrapper");
@@ -366,7 +358,6 @@
       const clave = prompt("Introduce el PIN de Administrador:");
       if (clave === PIN_ADMIN) {
         document.getElementById("statTiradas").textContent = localStorage.getItem("admin_tiradas") || "0";
-        document.getElementById("statPremios").textContent = localStorage.getItem("contador_premios") || "0";
         document.getElementById("adminModal").style.display = "flex";
       } else if (clave !== null) {
         alert("PIN incorrecto");
