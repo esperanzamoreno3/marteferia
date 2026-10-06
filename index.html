@@ -241,13 +241,13 @@
       // 25 a 99 (75%) -> No premio
       const suerte = Math.floor(Math.random() * 100);
 
-      if (suerte < 12) {
+      if (suerte < 0) {
         targetType = "chupito"; dtoVal = 1.50; nombrePremio = "1 Chupito gratis";
-      } else if (suerte < 13) {
+      } else if (suerte < 0) {
         targetType = "dto_cubata"; dtoVal = 2.00; nombrePremio = "-2,00€ Cubata";
-      } else if (suerte < 14) {
+      } else if (suerte < 0) {
         targetType = "cubata_gratis"; dtoVal = 6.00; nombrePremio = "Cubata gratis";
-      } else if (suerte < 17) {
+      } else if (suerte < 0) {
         targetType = "dto_rebujito"; dtoVal = 1.50; nombrePremio = "-1,50€ Rebujito";
       } else {
         targetType = "nada"; dtoVal = 0; nombrePremio = "NO PREMIO";
