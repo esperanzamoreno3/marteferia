@@ -233,11 +233,12 @@
     const targetType = premioElegido.type;
     const dtoVal = premioElegido.dto;
 
-    // Enviar a Google Sheets y obtener número global
+   // Enviar a Google Sheets y obtener número global
     let peticionSheet = Promise.resolve(null);
     if (GOOGLE_SCRIPT_URL && !GOOGLE_SCRIPT_URL.includes("YOUR-ID")) {
       peticionSheet = fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
+        mode: "no-cors", // Envía el dato garantizado sin bloqueo
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           fecha: new Date().toLocaleString("es-ES"),
@@ -246,8 +247,8 @@
           tipo: targetType,
           descuento: dtoVal
         })
-      }).then(r => r.json()).catch(() => null);
-    }
+      }).then(() => null).catch(() => null);
+    } 
 
     const indices = [];
     sectores.forEach((sec, idx) => { if (sec.type === targetType) indices.push(idx); });
