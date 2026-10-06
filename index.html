@@ -41,63 +41,27 @@
     .rules { text-align: left; font-size: 0.85rem; background: rgba(255,255,255,0.08); padding: 14px; border-radius: 12px; margin-top: 14px; line-height: 1.45; }
     .rules li { margin-left: 18px; margin-bottom: 5px; }
 
-    /* Botón deslizante para canjear */
     .slider-wrapper {
-      position: relative;
-      width: 100%;
-      height: 52px;
-      background: #2a2a2a;
-      border: 2px solid #ffd700;
-      border-radius: 30px;
-      margin: 16px 0;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
+      position: relative; width: 100%; height: 52px; background: #2a2a2a; border: 2px solid #ffd700;
+      border-radius: 30px; margin: 16px 0; overflow: hidden; display: flex; align-items: center; justify-content: center; user-select: none;
     }
-    .slider-text {
-      color: #ffd700;
-      font-size: 0.88rem;
-      font-weight: bold;
-      pointer-events: none;
-      letter-spacing: 0.5px;
-    }
+    .slider-text { color: #ffd700; font-size: 0.88rem; font-weight: bold; pointer-events: none; letter-spacing: 0.5px; }
     .slider-handle {
-      position: absolute;
-      left: 3px;
-      width: 44px;
-      height: 44px;
-      background: linear-gradient(135deg, #ffd700, #ff9800);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #111;
-      font-weight: 900;
-      font-size: 1.2rem;
-      cursor: grab;
-      touch-action: none;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      position: absolute; left: 3px; width: 44px; height: 44px; background: linear-gradient(135deg, #ffd700, #ff9800);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #111; font-weight: 900;
+      font-size: 1.2rem; cursor: grab; touch-action: none; box-shadow: 0 2px 6px rgba(0,0,0,0.5);
     }
     .canjeado-box {
-      background: #2e7d32;
-      color: #fff;
-      padding: 12px;
-      border-radius: 12px;
-      font-weight: bold;
-      margin: 16px 0;
-      border: 2px solid #a5d6a7;
-      animation: fadeIn 0.3s ease;
+      background: #2e7d32; color: #fff; padding: 12px; border-radius: 12px; font-weight: bold; margin: 16px 0;
+      border: 2px solid #a5d6a7; animation: fadeIn 0.3s ease;
     }
 
-    /* Modal Secreto */
     .admin-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; padding: 16px; }
     .admin-content { background: #1e1e1e; border: 2px solid #ffd700; border-radius: 18px; padding: 22px; max-width: 360px; width: 100%; text-align: left; }
     .admin-content h3 { color: #ffd700; margin-bottom: 12px; text-align: center; }
     .stat-item { margin-bottom: 10px; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; }
     .stat-item strong { color: #ffd700; }
-    .btn-admin { background: #ffd700; color: #111; border: none; padding: 10px; font-weight: bold; border-radius: 8px; width: 100%; margin-top: 12px; cursor: pointer; }
+    .btn-admin { background: #ffd700; color: #111; border: none; padding: 10px; font-weight: bold; border-radius: 8px; width: 100%; margin-top: 10px; cursor: pointer; }
     .btn-sheet { background: #0f9d58; color: #fff; text-decoration: none; display: block; text-align: center; padding: 10px; font-weight: bold; border-radius: 8px; margin-top: 8px; }
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -109,7 +73,7 @@
   <img src="IMG_5861.jpg" alt="Caseta El Resucitado" class="logo-header" id="adminTrigger">
   <h1>RULETA RESUCITADO</h1>
   <div class="dia-tag" id="diaTag">FERIA EL RESUCITADO</div>
-  <p style="font-size:0.9rem; color:#eee; margin-bottom:18px;">¡Prueba suerte y llévate descuentos en barra!</p>
+  <p style="font-size:0.9rem; color:#eee; margin-bottom:18px;">¡Prueba suerte y llévate premios en barra!</p>
 
   <div class="wheel-container">
     <div class="pointer"></div>
@@ -120,11 +84,17 @@
   <div id="resultado"></div>
 </div>
 
+<!-- Modal Secreto de Administrador -->
 <div class="admin-modal" id="adminModal">
   <div class="admin-content">
     <h3>🔒 PANEL DE CONTROL</h3>
-    <div class="stat-item">Tiradas locales: <strong id="statTiradas">0</strong></div>
-    <p style="font-size:0.8rem; color:#bbb; margin-top:8px;">Control general de la caseta:</p>
+    <div class="stat-item">Tiradas en este móvil: <strong id="statTiradas">0</strong></div>
+    
+    <div style="margin: 14px 0;">
+      <button class="btn-admin" style="background:#2e7d32; color:#fff;" onclick="activarPremioForzado()">🎁 Forzar Premio Siguiente Tirada</button>
+    </div>
+
+    <p style="font-size:0.8rem; color:#bbb; margin-top:6px;">Control global de la caseta:</p>
     <a href="https://docs.google.com/spreadsheets" target="_blank" class="btn-sheet">📊 Abrir Google Sheets</a>
     <button class="btn-admin" onclick="cerrarAdmin()">Cerrar Panel</button>
   </div>
@@ -133,12 +103,11 @@
 <script>
   const PIN_ADMIN = "2024";
   
-  // PEGA AQUÍ LA URL COMPLETA DE TU APPS SCRIPT ENTRE LAS COMILLAS
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQzXLuXp1g3gNi4-Ryb6-_mObobfYUVPLh7Shd7I23ea5QiZwXHkM-Bh1DBg1r1IWq/exec";
+  // URL de tu Apps Script
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQzXLuXp1g3gNi4-Ryb6-_mObobfYUVPLh7Shd7l23ea5QiZwXHKm-Bh1DBg1r1IWq/exec";
 
-  // Detección de día y estilo visual
   const fecha = new Date();
-  const diaSemana = fecha.getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb
+  const diaSemana = fecha.getDay();
   const hora = fecha.getHours();
   
   const diasConfig = [
@@ -154,18 +123,19 @@
   document.body.classList.add(diasConfig[diaSemana].clase);
   document.getElementById("diaTag").textContent = diasConfig[diaSemana].tag;
 
-  // Horario: Desde las 14:00 h hasta las 04:00 h
+  // Horario operativo (14:00 a 04:00 h)
   const esValido = (hora >= 14 || hora < 4);
 
+  // 8 Sectores equilibrados para el canvas
   const sectores = [
-    { text: "-1,50€ CUBATA", color: "#d81b60", type: "dto_cubata", dto: 1.50 },
-    { text: "SUERTE", color: "#37474f", type: "nada", dto: 0 },
-    { text: "-1,00€ REBUJITO", color: "#0288d1", type: "dto_rebujito", dto: 1.00 },
-    { text: "SUERTE", color: "#263238", type: "nada", dto: 0 },
-    { text: "1 CHUPITO", color: "#2e7d32", type: "chupito", dto: 1.50 },
-    { text: "SUERTE", color: "#37474f", type: "nada", dto: 0 },
-    { text: "-1,00€ REBUJITO", color: "#0288d1", type: "dto_rebujito", dto: 1.00 },
-    { text: "SUERTE", color: "#263238", type: "nada", dto: 0 }
+    { text: "1 CHUPITO", color: "#2e7d32", type: "chupito" },
+    { text: "SUERTE", color: "#37474f", type: "nada" },
+    { text: "-2,00€ CUBATA", color: "#d81b60", type: "dto_cubata" },
+    { text: "SUERTE", color: "#263238", type: "nada" },
+    { text: "CUBATA GRATIS", color: "#e65100", type: "cubata_gratis" },
+    { text: "SUERTE", color: "#37474f", type: "nada" },
+    { text: "-1,50€ REBUJITO", color: "#0288d1", type: "dto_rebujito" },
+    { text: "SUERTE", color: "#263238", type: "nada" }
   ];
 
   const canvas = document.getElementById("wheel");
@@ -182,8 +152,8 @@
       ctx.arc(cx, cy, r, angle, angle + arcSize); ctx.fill();
       ctx.lineWidth = 3; ctx.strokeStyle = "#ffd700"; ctx.stroke();
       ctx.save(); ctx.translate(cx, cy); ctx.rotate(angle + arcSize / 2);
-      ctx.textAlign = "right"; ctx.fillStyle = "#fff"; ctx.font = "bold 23px sans-serif";
-      ctx.fillText(sectores[i].text, r - 22, 8); ctx.restore();
+      ctx.textAlign = "right"; ctx.fillStyle = "#fff"; ctx.font = "bold 21px sans-serif";
+      ctx.fillText(sectores[i].text, r - 20, 8); ctx.restore();
     }
     ctx.beginPath(); ctx.arc(cx, cy, 36, 0, 2 * Math.PI); ctx.fillStyle = "#ffd700"; ctx.fill();
     ctx.lineWidth = 4; ctx.strokeStyle = "#ffffff"; ctx.stroke();
@@ -196,6 +166,27 @@
   const claveTiempo = "tiro_resucitado_" + diasConfig[diaSemana].nombre.toLowerCase();
   const ultimo = localStorage.getItem(claveTiempo);
   const ahora = Date.now();
+
+  let ruletaBloqueadaRemoto = false;
+
+  // Consulta remota de bloqueo en Sheets (celda H1)
+  if (GOOGLE_SCRIPT_URL) {
+    fetch(GOOGLE_SCRIPT_URL)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.bloqueado) {
+          ruletaBloqueadaRemoto = true;
+          spinBtn.disabled = true;
+          spinBtn.textContent = "PAUSADO";
+          resultadoDiv.innerHTML = `
+            <div class="result-box">
+              <div class="badge badge-horario">⚠️ JUEGO PAUSADO</div>
+              <p style="color:#bbb; font-size:0.95rem; margin-top:8px;">La ruleta se encuentra en pausa temporal por la organización.</p>
+            </div>`;
+        }
+      })
+      .catch(() => null);
+  }
 
   if (!esValido) {
     spinBtn.disabled = true; spinBtn.textContent = "FUERA DE HORARIO";
@@ -215,25 +206,53 @@
   }
 
   function girarRuleta() {
-    if (isSpinning || !esValido) return;
+    if (isSpinning || !esValido || ruletaBloqueadaRemoto) return;
     isSpinning = true; spinBtn.disabled = true; resultadoDiv.innerHTML = "";
     localStorage.setItem(claveTiempo, Date.now());
 
     let totalT = parseInt(localStorage.getItem("admin_tiradas") || "0") + 1;
     localStorage.setItem("admin_tiradas", totalT);
 
-    // MODO PRUEBA ACTIVO (Fuerza siempre premio para probar)
-    const premiosPrueba = [
-      { type: "dto_cubata", dto: 1.50 },
-      { type: "dto_rebujito", dto: 1.00 },
-      { type: "chupito", dto: 1.50 }
-    ];
-    const premioElegido = premiosPrueba[Math.floor(Math.random() * premiosPrueba.length)];
-    const targetType = premioElegido.type;
-    const dtoVal = premioElegido.dto;
+    let targetType = "nada", dtoVal = 0, nombrePremio = "NO PREMIO";
+    const forzarActivo = localStorage.getItem("admin_forzar_premio") === "true";
 
-    // Enviar a Google Sheets en segundo plano sin esperar respuesta
-    if (GOOGLE_SCRIPT_URL && !GOOGLE_SCRIPT_URL.includes("YOUR-ID")) {
+    if (forzarActivo) {
+      // PREMIO FORZADO POR ADMINISTRADOR
+      const premios = [
+        { type: "chupito", dto: 1.50, nom: "1 Chupito gratis" },
+        { type: "dto_cubata", dto: 2.00, nom: "-2€ Cubata" },
+        { type: "cubata_gratis", dto: 6.00, nom: "Cubata gratis" },
+        { type: "dto_rebujito", dto: 1.50, nom: "-1,50€ Rebujito" }
+      ];
+      const p = premios[Math.floor(Math.random() * premios.length)];
+      targetType = p.type;
+      dtoVal = p.dto;
+      nombrePremio = p.nom;
+      localStorage.removeItem("admin_forzar_premio");
+    } else {
+      // PROBABILIDAD REAL POR CADA 100 TIRADAS:
+      // 0 a 11 (12%) -> Chupito gratis
+      // 12 a 16 (5%)  -> Descuento 2€ Cubata
+      // 17 a 19 (3%)  -> Cubata gratis
+      // 20 a 24 (5%)  -> Descuento 1,50€ Rebujito
+      // 25 a 99 (75%) -> No premio
+      const suerte = Math.floor(Math.random() * 100);
+
+      if (suerte < 12) {
+        targetType = "chupito"; dtoVal = 1.50; nombrePremio = "1 Chupito gratis";
+      } else if (suerte < 17) {
+        targetType = "dto_cubata"; dtoVal = 2.00; nombrePremio = "-2,00€ Cubata";
+      } else if (suerte < 20) {
+        targetType = "cubata_gratis"; dtoVal = 6.00; nombrePremio = "Cubata gratis";
+      } else if (suerte < 25) {
+        targetType = "dto_rebujito"; dtoVal = 1.50; nombrePremio = "-1,50€ Rebujito";
+      } else {
+        targetType = "nada"; dtoVal = 0; nombrePremio = "NO PREMIO";
+      }
+    }
+
+    // Registrar en Sheets en segundo plano
+    if (GOOGLE_SCRIPT_URL) {
       fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
@@ -241,8 +260,8 @@
         body: JSON.stringify({
           fecha: new Date().toLocaleString("es-ES"),
           dia: diasConfig[diaSemana].nombre,
-          resultado: "PREMIO",
-          tipo: targetType,
+          resultado: (targetType === "nada" ? "NO PREMIO" : "PREMIO"),
+          tipo: nombrePremio,
           descuento: dtoVal
         })
       }).catch(() => null);
@@ -265,7 +284,15 @@
         requestAnimationFrame(animate);
       } else {
         isSpinning = false;
-        mostrarPremio(targetType);
+        if (targetType === "nada") {
+          resultadoDiv.innerHTML = `
+            <div class="result-box">
+              <div class="badge badge-lose">😢 ¡NO HUBO SUERTE!</div>
+              <p style="color:#bbb; font-size:0.95rem; margin-top:8px;">Gracias por participar. ¡Prueba otra vez más tarde!</p>
+            </div>`;
+        } else {
+          mostrarPremio(targetType);
+        }
       }
     }
     requestAnimationFrame(animate);
@@ -273,16 +300,25 @@
 
   function mostrarPremio(tipo) {
     let tit = "", det = "";
-    if (tipo === "dto_cubata") { tit = "🍹 ¡1,50€ DE DESCUENTO EN CUBATA!"; det = "Descuento de 1,50 € en tu cubata al pedir en barra."; }
-    else if (tipo === "dto_rebujito") { tit = "🌿 ¡1,00€ DE DESCUENTO EN REBUJITO!"; det = "Descuento de 1,00 € en tu rebujito al pedir en barra."; }
-    else { tit = "🥃 ¡CHUPITO DE REGALO!"; det = "Un chupito de regalo al pedir tu consumición."; }
+    if (tipo === "chupito") {
+      tit = "🥃 ¡1 CHUPITO GRATIS!";
+      det = "Un chupito gratis al pedir tu consumición en barra.";
+    } else if (tipo === "dto_cubata") {
+      tit = "🍹 ¡2,00€ DE DESCUENTO EN CUBATA!";
+      det = "Descuento de 2,00 € en tu cubata al pedir en barra.";
+    } else if (tipo === "cubata_gratis") {
+      tit = "🍸 ¡1 CUBATA GRATIS!";
+      det = "Un cubata de regalo cortesía de Caseta El Resucitado.";
+    } else if (tipo === "dto_rebujito") {
+      tit = "🌿 ¡1,50€ DE DESCUENTO EN REBUJITO!";
+      det = "Descuento de 1,50 € en tu rebujito al pedir en barra.";
+    }
 
     resultadoDiv.innerHTML = `
       <div class="result-box">
         <h2 style="font-size:1.35rem; color:#ffd700; margin-bottom: 6px;">${tit}</h2>
         <div class="time-box">📅 Válido únicamente hoy en Caseta El Resucitado</div>
         
-        <!-- Botón deslizante interactivo de barra -->
         <div class="slider-wrapper" id="sliderWrapper">
           <span class="slider-text">DESLIZAR PARA CANJEAR ➔</span>
           <div class="slider-handle" id="sliderHandle">➔</div>
@@ -364,6 +400,16 @@
       }
     }
   });
+
+  function activarPremioForzado() {
+    localStorage.setItem("admin_forzar_premio", "true");
+    localStorage.removeItem(claveTiempo);
+    spinBtn.disabled = false;
+    spinBtn.textContent = "¡PROBAR SUERTE!";
+    resultadoDiv.innerHTML = "";
+    alert("🎁 ¡Premio forzado activado! La siguiente tirada en este móvil ganará premio asegurado.");
+    cerrarAdmin();
+  }
 
   function cerrarAdmin() { document.getElementById("adminModal").style.display = "none"; }
 </script>
