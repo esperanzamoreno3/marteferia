@@ -190,25 +190,17 @@
       })
       .catch(() => null);
   }
-
-  if (!esValido) {
-    spinBtn.disabled = true; spinBtn.textContent = "FUERA DE HORARIO";
+spinBtn.disabled = true;
+    spinBtn.textContent = "FINALIZADO";
     resultadoDiv.innerHTML = `
       <div class="result-box">
-        <div class="badge badge-horario">⛔ NO ESTÁS DENTRO DEL HORARIO DEL SORTEO</div>
-        <p style="color:#bbb; font-size:0.95rem; margin-top:8px;">El sorteo está disponible de <strong>14:00 a 04:00 h</strong>.<br>¡Vuelve dentro del horario para participar!</p>
+        <div class="badge badge-horario">🎪 PROMOCIÓN FINALIZADA</div>
+        <p style="color:#bbb; font-size:0.95rem; margin-top:8px;">La ruleta del Martes de Feria ha concluido.<br>¡Gracias por participar!</p>
       </div>`;
-  } else if (ultimo && (ahora - parseInt(ultimo)) < COOLDOWN) {
-    const restante = Math.ceil((COOLDOWN - (ahora - parseInt(ultimo))) / 60000);
-    spinBtn.disabled = true; spinBtn.textContent = "BLOQUEADO";
-    resultadoDiv.innerHTML = `
-      <div class="result-box">
-        <div class="badge badge-lose">⏳ Ya has probado suerte</div>
-        <p style="color:#bbb; font-size:0.95rem; margin-top:6px;">Solo 1 tirada cada 60 minutos por persona.<br>Vuelve a girar en <strong>${restante} minutos</strong>.</p>
-      </div>`;
-  }
 
-  function girarRuleta() {
+    function girarRuleta() {
+    alert("🎪 La promoción del Martes de Feria ha finalizado.");
+    return;
     if (isSpinning || !esValido || ruletaBloqueadaRemoto) return;
     isSpinning = true; spinBtn.disabled = true; resultadoDiv.innerHTML = "";
     localStorage.setItem(claveTiempo, Date.now());
